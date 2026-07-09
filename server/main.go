@@ -1,8 +1,11 @@
 package main
 
 import (
+	"wasi-grpc/gen"
+
 	"github.com/jamesstocktonj1/componentize-sdk/p3/cli"
 	"github.com/jamesstocktonj1/componentize-sdk/p3/net/socket"
+	"google.golang.org/grpc"
 )
 
 func init() {
@@ -15,13 +18,9 @@ func run() error {
 		return err
 	}
 
-	for {
-		conn, err := listen.Accept()
-		if err != nil {
-			return err
-		}
-		defer conn.Close()
-	}
+	sgrpc := grpc.NewServer(nil)
+	gen.RegisterGreeterServer(sgrpc, &server{})
+	return sgrpc.Serve(listen)
 }
 
 func main() {}
